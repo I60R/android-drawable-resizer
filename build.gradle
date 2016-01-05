@@ -12,6 +12,6 @@ dependencies {
 }
 
 group='com.github.forsety'
-version='0.1'
+version='0.1-psegina'
 
 uploadArchives.repositories.mavenLocal()

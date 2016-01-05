@@ -1,3 +1,7 @@
+```
+This is a fork of version 0.1 of the original ADR plugin by Forsety and includes minor fixes necessary to work with the latest version of the Android Gradle plugin (currently 2.0.0-alpha3).
+```
+
 Android Drawable Resizer Gradle Plugin
 ======================================
 
@@ -9,31 +13,15 @@ changed and stored under the project 'build' folder.
 Usage
 -----
 
-* From jcenter:
-  * Add this to your Android project 'build.gradle' file
-```groovy
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.forsety:adr:0.1'
-    }
-}
-
-apply plugin: 'com.github.forsety.adr'
-```
-* From local Maven repository:
-    * Import this project to your Android Studio and run 'install' gradle task. After this project 
-        will be available from your local Maven repository.
-    * Add this to your Android project 'build.gradle' file
+* Clone the project and run `gradle clean install`
+* Add this to your Android project 'build.gradle' file
 ```groovy
 buildscript {
     repositories {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.github.forsety:adr:0.1'
+        classpath 'com.github.forsety:adr:0.1-psegina'
     }
 }
 
