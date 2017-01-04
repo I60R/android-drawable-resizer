@@ -56,7 +56,7 @@ public class ResizeDrawablesTask extends DefaultTask {
         // Add output res dirs to resource merger
         MergeResources mergeTask = variant.getMergeResources();
         List<ResourceSet> mergeSets = mergeTask.getInputResourceSets();
-        ResourceSet adrSet = new ResourceSet(variant.getName()+ "ADR");
+        ResourceSet adrSet = new ResourceSet(variant.getName(), "ADR");
         adrSet.addSources(outputResDirs);
         mergeSets.add(adrSet);
         mergeTask.setInputResourceSets(mergeSets);
