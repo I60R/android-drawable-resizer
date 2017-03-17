@@ -1,5 +1,7 @@
 ```
-This is a fork of version 0.1 of the original ADR plugin by Forsety and includes minor fixes necessary to work with the latest version of the Android Gradle plugin (currently 2.0.0-alpha3).
+This is a fork of version 0.1 of the original ADR plugin by Forsety and includes minor fixes (by mrPjer) necessary to work with the latest version of the Android Gradle plugin (currently 2.3.0).
+
+Also rewritten in Kotlin
 ```
 
 Android Drawable Resizer Gradle Plugin
@@ -21,7 +23,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.github.forsety:adr:0.1-psegina'
+        classpath 'com.github.forsety:adr:0.2-160R'
     }
 }
 
@@ -38,8 +40,8 @@ In your 'build.gradle' file add:
 ```groovy
 adr {
     minDensity "mdpi"
-    baseDensity "xxhdpi"
-    generateTvDpi false
+    maxDensity "xxxhdpi"
+    // exclude += [ "tvdpi" ] // <- is set by default"
 }
 ```
 Example shows default configuration, so if it suits your needs - you don't need configuration at all.
