@@ -1,5 +1,5 @@
 apply plugin: 'maven'
-apply plugin: 'java'
+apply plugin: 'kotlin'
 
 repositories {
     mavenCentral()
@@ -10,9 +10,20 @@ dependencies {
     compile gradleApi()
     compile 'com.android.tools.build:gradle:2.2.3'
     compile 'org.imgscalr:imgscalr-lib:4.2'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 }
 
 group='com.github.forsety'
-version='0.1-psegina'
+version='0.2-160R'
 
 uploadArchives.repositories.mavenLocal()
+
+buildscript {
+    ext.kotlin_version = '1.1.1'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
