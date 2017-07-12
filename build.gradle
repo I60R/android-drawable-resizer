@@ -1,25 +1,5 @@
-apply plugin: 'maven'
-apply plugin: 'kotlin'
-
-repositories {
-    mavenCentral()
-    jcenter()
-}
-
-dependencies {
-    compile gradleApi()
-    compile 'com.android.tools.build:gradle:2.2.3'
-    compile 'org.imgscalr:imgscalr-lib:4.2'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-}
-
-group='com.github.forsety'
-version='0.2-160R'
-
-uploadArchives.repositories.mavenLocal()
-
 buildscript {
-    ext.kotlin_version = '1.1.1'
+    ext.kotlin_version = '1.1.3-2'
     repositories {
         mavenCentral()
     }
@@ -27,3 +7,42 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
+
+apply plugin: 'maven'
+apply plugin: 'kotlin'
+
+
+group='com.github.forsety'
+version='0.3-160R'
+
+
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+}
+
+dependencies {
+    implementation gradleApi()
+    implementation 'com.android.tools.build:gradle:3.0.0-alpha5'
+    implementation 'org.imgscalr:imgscalr-lib:4.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+}
+
+
+uploadArchives{
+    repositories{
+        mavenLocal()
+    }
+}
+
+
+
+
+
+
+
+
+
+
+

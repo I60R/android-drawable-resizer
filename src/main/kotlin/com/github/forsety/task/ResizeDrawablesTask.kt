@@ -11,7 +11,6 @@ import java.io.File
 import java.util.regex.Pattern
 
 
-
 /***
  * Created by Forsety on 27.08.2014.
  *
@@ -19,85 +18,76 @@ import java.util.regex.Pattern
  */
 open class ResizeDrawablesTask : DefaultTask() {
 
-    var variant: BaseVariant? = null
+    lateinit var baseVariant: BaseVariant
 
 
+    val inpDirs by lazy {
+        baseVariant
+                .sourceSets
+                .flatMap { it.resDirectories }
+                .filter(File::exists)
+    }
 
-    val inpDirs
-            = variant
-            ?.sourceSets
-            ?.flatMap { it.resDirectories }
-            ?.filter(File::exists)
-            ?:listOf()
-
-    val outDirs
-            = File(project.buildDir, "adr")
-            .let { baseOutputDir ->
-                inpDirs.map {
-                    val outputFilePath = it.absolutePath.replace(project.projectDir.absolutePath, "")
-                    File(baseOutputDir, outputFilePath)
+    val outDirs by lazy {
+        val baseOutputDir = File(project.buildDir, "adr")
+        inpDirs
+                .map {
+                    File(baseOutputDir, it.absolutePath.replace(project.projectDir.absolutePath, ""))
                 }
-            }
-
-    val targets = inpDirs.zip(outDirs)
-
+                .toSet()
+    }
 
 
     @TaskAction
     fun resize() {
+        project.extensions
+                .findByType<ADRExtension>(ADRExtension::class.java)
+                .run {
 
-        val variant = variant ?: throw RuntimeException("No build variant was specified")
+                    val drawableFolderPattern = Pattern
+                            .compile("^(drawable|mipmap)-.*" + maxDensityInfo.qualifierName + ".*$")
 
-        val  adr = project.extensions.findByType<ADRExtension>(ADRExtension::class.java)
-        with(adr) {
+                    val densitiesRange = (minDensityInfo.ordinal..(maxDensityInfo.ordinal - 1))
 
-            val drawableFolderPattern = Pattern
-                    .compile("^(drawable|mipmap)-.*" + maxDensityInfo.qualifierName + ".*$")
+                    val targetDensities = Density
+                            .values()
+                            .slice(densitiesRange)
+                            .filterNot(excludeInfo::contains)
 
-            val densitiesRange = (minDensityInfo.ordinal..(maxDensityInfo.ordinal - 1))
+                    val resizers: List<BatchDrawableResizer> = targetDensities
+                            .flatMap { targetDensity ->
 
-            val resizers = Density
-                    .values()
-                    .slice(densitiesRange)
-                    .filterNot(excludeInfo::contains)
-                    .flatMap { density ->
+                                inpDirs.zip(outDirs).flatMap { (inputResDir, outputResDir) ->
+                                    inputResDir
+                                            .listFiles()
+                                            .filter { drawableFolderPattern.matcher(it.name).matches() }
+                                            .map { inputDrawableDir ->
 
-                        targets.flatMap { (inputResDir, outputResDir) ->
-                            inputResDir
-                                    .listFiles()
-                                    .filter { drawableFolderPattern.matcher(it.name).matches() }
-                                    .map { inputDrawableDir ->
+                                                val outputDrawableDirName = inputDrawableDir.name.replace(maxDensityInfo.qualifierName, targetDensity.qualifierName)
 
-                                        val outputDirName = inputDrawableDir.name.replace(maxDensityInfo.qualifierName, density.qualifierName)
+                                                val outputDrawableDir = File(outputResDir, outputDrawableDirName).apply { if (!exists()) mkdirs() }
 
-                                        File(outputResDir, outputDirName)
-                                                .apply { if (!exists()) mkdirs() }
-                                                .let { outputDrawableDir ->
+                                                val resultDensity = (targetDensity.value.toDouble() / maxDensityInfo.value)
 
-                                                    val resultDensity = (density.value.toDouble() / maxDensityInfo.value)
+                                                BatchDrawableResizer(inputDrawableDir, outputDrawableDir, resultDensity)
+                                            }
+                                }
+                            }
 
-                                                    BatchDrawableResizer(inputDrawableDir, outputDrawableDir, resultDensity)
-                                                            .also(BatchDrawableResizer::start)
-                                                }
-                                    }
-                        }
+                    resizers.forEach {
+                        it.start()
+                        it.join()
                     }
 
-        with(variant) {
-            val adrSet = ResourceSet(name, "ADR").apply { addSources(outDirs) }
-            mergeResources
-                    .inputResourceSets
-                    .add(adrSet) // Add output res dirs to resource merger
-        }
+                    baseVariant
+                            .mergeResources
+                            .extraGeneratedResFolders
+                            .files += outDirs   // Add output res dirs to resource merger
 
 
-        resizers.forEach(Thread::join)
+                    didWork = resizers.map { it.resizedDrawablesCount }.fold(0, Int::plus) > 0
 
-        didWork = resizers
-                .map { it.resizedDrawablesCount }
-                .fold(0, Int::plus) > 0
-
-        }
+                }
     }
 
 }

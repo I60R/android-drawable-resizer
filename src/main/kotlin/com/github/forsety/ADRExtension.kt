@@ -11,9 +11,9 @@ open class ADRExtension {
     var minDensity = Density.MDPI.name
     var exclude = mutableListOf("tvdpi")
 
-    lateinit var maxDensityInfo: Density
-    lateinit var minDensityInfo: Density
-    lateinit var excludeInfo: List<Density>
+    internal lateinit var maxDensityInfo: Density
+    internal lateinit var minDensityInfo: Density
+    internal lateinit var excludeInfo: List<Density>
 
 
     fun validate() {
